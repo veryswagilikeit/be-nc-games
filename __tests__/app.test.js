@@ -26,4 +26,16 @@ describe("3. GET /api/categories", () => {
                 });
             });
     });
+
+    describe("Errors", () => {
+        it("404: Should return a 'Not Found' error when endpoint doesn't exist", () => {
+            return request(app)
+                .get("/not-a-route")
+                .expect(404)
+                .then((res) => {
+                    const body = res.body;
+                    expect(body).toEqual({ msg: "Not Found "})
+                })
+        })
+    })
 });
