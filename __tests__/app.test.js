@@ -35,7 +35,33 @@ describe("3. GET /api/categories", () => {
                 .then((res) => {
                     const body = res.body;
                     expect(body).toEqual({ msg: "Not Found "})
-                })
-        })
-    })
+                });
+        });
+    });
+});
+
+describe("3.5. GET /api", () => {
+    it("200: Should respond with a JSON object describing all the available endpoints on the API", () => {
+        return request(app)
+            .get("/api")
+            .expect(200)
+            .then((res) => {
+                const body = res.body;
+                
+                expect(Object.keys(body)).toContain("GET /api", "GET /api/categories");
+
+                expect(body["GET /api"]).toEqual(
+                    expect.objectContaining({
+                        description: expect.any(String)
+                    })
+                );
+                expect(body["GET /api/categories"]).toEqual(
+                    expect.objectContaining({
+                        description: expect.any(String),
+                        queries: expect.any(Array),
+                        exampleResponse: expect.any(Object)
+                    })
+                );
+            });
+    });
 });
