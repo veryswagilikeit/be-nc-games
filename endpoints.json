@@ -31,5 +31,22 @@
         }
       ]
     }
+  },
+  "GET /api/reviews/:review_id": {
+    "description": "serves an object of the review matching the id specified",
+    "queries": [],
+    "exampleResponse": {
+      "review": {
+        "review_id": 1,
+        "title": "Culture a Love of Agriculture With Agricola",
+        "category": "strategy",
+        "designer": "Uwe Rosenberg",
+        "owner": "tickle122",
+        "review_body": "You could sum up Agricola with the simple phrase 'Farmyard Fun' but the mechanics and game play add so much more than that. You'll find yourself torn between breeding pigs, or sowing crops. Its joyeous and rewarding and it makes you think of time spent outside, which is much harder to do these days!",
+        "review_img_url": "https://images.pexels.com/photos/974314/pexels-photo-974314.jpeg?w=700&h=700",
+        "created_at": "2021-01-18T10:00:20.514Z",
+        "votes": 1
+      }
+    }
   }
 }
