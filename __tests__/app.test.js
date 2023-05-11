@@ -3,6 +3,7 @@ const app = require("../app.js");
 const db = require("../db/connection.js");
 const seed = require("../db/seeds/seed.js");
 const data = require("../db/data/test-data");
+const json = require("../endpoints.json");
 
 beforeEach(() => seed(data));
 
@@ -35,7 +36,19 @@ describe("3. GET /api/categories", () => {
                 .then((res) => {
                     const body = res.body;
                     expect(body).toEqual({ msg: "Not Found "})
-                })
-        })
-    })
+                });
+        });
+    });
+});
+
+describe("3.5. GET /api", () => {
+    it("200: Should respond with a JSON object describing all the available endpoints on the API", () => {
+        return request(app)
+            .get("/api")
+            .expect(200)
+            .then((res) => {
+                const body = res.body;
+                expect(body).toEqual(json);
+            });
+    });
 });
