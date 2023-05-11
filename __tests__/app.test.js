@@ -4,6 +4,7 @@ const db = require("../db/connection.js");
 const seed = require("../db/seeds/seed.js");
 const data = require("../db/data/test-data");
 const json = require("../endpoints.json");
+require("jest-sorted");
 
 beforeEach(() => seed(data));
 
@@ -68,7 +69,9 @@ describe("5. GET /api/reviews", () => {
             .then(({ body: reviews }) => {
                 const reviewsArr = reviews.reviews;
                 expect(reviewsArr).toHaveLength(13);
+                expect(reviewsArr[4].comment_count).toBe(3);
                 reviewsArr.forEach((review) => {
+                    expect("body" in review).toBe(false);
                     expect(review).toEqual(
                         expect.objectContaining({
                             owner: expect.any(String),
@@ -90,11 +93,7 @@ describe("5. GET /api/reviews", () => {
             .get("/api/reviews")
             .expect(200)
             .then(({ body: { reviews } }) => {
-                expect(
-                    reviews.every((review, index) => {
-                        return (index === 0 || review.created_at <= reviews[index - 1].created_at);
-                    })
-                ).toBe(true);
+                expect(reviews).toBeSortedBy("created_at", {descending: true});
             });
     });
 });
