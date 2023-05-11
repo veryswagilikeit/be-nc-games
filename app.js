@@ -1,6 +1,5 @@
 const express = require("express");
-const { getCategories, getEndpointJSON } = require("./controllers/controller.js");
-const { getCategories, getReviewById } = require("./controllers/controller.js");
+const { getCategories, getEndpointJSON, getReviewById } = require("./controllers/controller.js");
 
 const app = express();
 
