@@ -10,16 +10,16 @@ exports.selectReviewById = (id) => {
     return db
         .query(`SELECT * FROM reviews WHERE reviews.review_id = $1;`, [id])
         .then(({ rows }) => {
-            return rows[0];
+            return rows;
         })
         .then((review) => {
-            if (review === undefined) {
+            if (!review.length) {
                 return Promise.reject({
                     status: 404,
                     msg: "Not Found",
                 });
             } else {
-                return review;
+                return review[0];
             };
         });
 };
