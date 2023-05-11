@@ -4,6 +4,7 @@ const db = require("../db/connection.js");
 const seed = require("../db/seeds/seed.js");
 const data = require("../db/data/test-data");
 const json = require("../endpoints.json");
+require("jest-sorted");
 
 beforeEach(() => seed(data));
 
@@ -94,5 +95,42 @@ describe("4. GET /api/reviews/:review_id", () => {
                     expect(body).toEqual({ msg: "Bad Request "});
             });
         });
+    });
+});
+
+describe("5. GET /api/reviews", () => {
+    it("200: Should respond with an array of review objects", () => {
+        return request(app)
+            .get("/api/reviews")
+            .expect(200)
+            .then(({ body: reviews }) => {
+                const reviewsArr = reviews.reviews;
+                expect(reviewsArr).toHaveLength(13);
+                expect(reviewsArr[4].comment_count).toBe(3);
+                reviewsArr.forEach((review) => {
+                    expect("body" in review).toBe(false);
+                    expect(review).toEqual(
+                        expect.objectContaining({
+                            owner: expect.any(String),
+                            title: expect.any(String),
+                            review_id: expect.any(Number),
+                            category: expect.any(String),
+                            review_img_url: expect.any(String),
+                            created_at: expect.any(String),
+                            votes: expect.any(Number),
+                            designer: expect.any(String),
+                            comment_count: expect.any(Number),
+                        })
+                    );
+                });
+            });
+    });
+    it("200: Should respond with reviews sorted by date (desc) by default", () => {
+        return request(app)
+            .get("/api/reviews")
+            .expect(200)
+            .then(({ body: { reviews } }) => {
+                expect(reviews).toBeSortedBy("created_at", {descending: true});
+            });
     });
 });
