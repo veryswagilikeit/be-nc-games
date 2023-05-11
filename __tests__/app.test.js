@@ -3,6 +3,7 @@ const app = require("../app.js");
 const db = require("../db/connection.js");
 const seed = require("../db/seeds/seed.js");
 const data = require("../db/data/test-data");
+const json = require("../endpoints.json");
 
 beforeEach(() => seed(data));
 
@@ -47,21 +48,7 @@ describe("3.5. GET /api", () => {
             .expect(200)
             .then((res) => {
                 const body = res.body;
-                
-                expect(Object.keys(body)).toContain("GET /api", "GET /api/categories");
-
-                expect(body["GET /api"]).toEqual(
-                    expect.objectContaining({
-                        description: expect.any(String)
-                    })
-                );
-                expect(body["GET /api/categories"]).toEqual(
-                    expect.objectContaining({
-                        description: expect.any(String),
-                        queries: expect.any(Array),
-                        exampleResponse: expect.any(Object)
-                    })
-                );
+                expect(body).toEqual(json);
             });
     });
 });
