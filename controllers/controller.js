@@ -1,4 +1,4 @@
-const { selectCategories, selectReviewById, selectReviews } = require("../models/model")
+const { selectCategories, selectReviewById, selectReviews, selectCommentsByReviewId } = require("../models/model")
 const endpointsJSON = require("../endpoints.json");
 
 exports.getEndpointJSON = (req, res, next) => {
@@ -25,4 +25,13 @@ exports.getReviews = (req, res) => {
     selectReviews().then((reviews) => {
         res.status(200).send({ reviews });
     });
+};
+
+exports.getCommentsByArticleId = (req, res, next) => {
+    const id = req.params.review_id;
+    selectCommentsByReviewId(id)
+        .then((comments) => {
+            res.status(200).send({ comments });
+        })
+        .catch(next);
 };

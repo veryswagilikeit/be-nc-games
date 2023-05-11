@@ -36,10 +36,10 @@ describe("3. GET /api/categories", () => {
                 .expect(404)
                 .then((res) => {
                     const body = res.body;
-                    expect(body).toEqual({ msg: "Not Found "})
-                })
-        })
-    })
+                    expect(body).toEqual({ msg: "Not Found" })
+                });
+        });
+    });
 });
 
 describe("3.5. GET /api", () => {
@@ -92,7 +92,7 @@ describe("4. GET /api/reviews/:review_id", () => {
                 .expect(400)
                 .then((res) => {
                     const body = res.body;
-                    expect(body).toEqual({ msg: "Bad Request "});
+                    expect(body).toEqual({ msg: "Bad Request" });
             });
         });
     });
@@ -125,6 +125,7 @@ describe("5. GET /api/reviews", () => {
                 });
             });
     });
+
     it("200: Should respond with reviews sorted by date (desc) by default", () => {
         return request(app)
             .get("/api/reviews")
@@ -132,5 +133,71 @@ describe("5. GET /api/reviews", () => {
             .then(({ body: { reviews } }) => {
                 expect(reviews).toBeSortedBy("created_at", {descending: true});
             });
+    });
+});
+
+describe("6. GET /api/reviews/:review_id/comments", () => {
+    it("200: Should respond with an empty array when there are no comments on the review", () => {
+        const id = 1;
+        return request(app)
+            .get(`/api/reviews/${id}/comments`)
+            .expect(200)
+            .then(({ body: comments }) => {
+                const commentsArr = comments.comments;
+                expect(commentsArr).toEqual([]);
+            });
+    });
+
+    it("200: Should respond with the comment object corresponding to the review ID given", () => {
+        const id = 5;
+        return request(app)
+            .get(`/api/reviews/${id}/comments`)
+            .expect(200)
+            .then(({ body: comments }) => {
+                const commentsArr = comments.comments;
+                commentsArr.forEach((comment) => {
+                    expect(comment).toEqual(
+                        expect.objectContaining({
+                            comment_id: expect.any(Number),
+                            author: expect.any(String),
+                            body: expect.any(String),
+                            created_at: expect.any(String),
+                            votes: expect.any(Number),
+                        })
+                    );
+                });
+            });
+    });
+
+    it("200: Should respond with comments sorted by date (desc) by default", () => {
+        const id = 2;
+        return request(app)
+            .get(`/api/reviews/${id}/comments`)
+            .expect(200)
+            .then(({ body: { comments } }) => {
+                expect(comments).toBeSortedBy("created_at", {descending: true});
+            });
+    });
+
+    describe("Errors", () => {
+        it("404: Should return a 'Not Found' error when an endpoint with the provided ID doesn't exist", () => {
+            return request(app)
+                .get("/api/reviews/9999/comments")
+                .expect(404)
+                .then((res) => {
+                    const body = res.body;
+                    expect(body).toEqual({ msg: "Not Found" });
+                });
+        });
+
+        it("400: Should return a 'Bad Request' error when the provided ID is an incorrect data type", () => {
+            return request(app)
+                .get("/api/reviews/notanumber/comments")
+                .expect(400)
+                .then((res) => {
+                    const body = res.body;
+                    expect(body).toEqual({ msg: "Bad Request" });
+                });
+        });
     });
 });

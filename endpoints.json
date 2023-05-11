@@ -48,5 +48,37 @@
         "votes": 1
       }
     }
+  },
+  "GET /api/reviews/:review_id/comments": {
+    "description": "serves an array of all comments matching the review id specified",
+    "queries": [],
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 59,
+          "votes": 3,
+          "created_at": "2021-03-27T19:48:58.110Z",
+          "author": "jessjelly",
+          "body": "Quis duis mollit ad enim deserunt.",
+          "review_id": 1
+        },
+        {
+          "comment_id": 60,
+          "votes": 17,
+          "created_at": "2021-03-27T14:15:38.110Z",
+          "author": "cooljmessy",
+          "body": "Laboris nostrud ea ex occaecat aute quis consectetur anim.",
+          "review_id": 1
+        },
+        {
+          "comment_id": 61,
+          "votes": 1,
+          "created_at": "2021-03-27T14:15:36.110Z",
+          "author": "weegembump",
+          "body": "Consequat nisi dolor nulla esse sunt eu ipsum laborum deserunt duis. Ffugiat sint et proident ex do consequat est. Nisi minim laboris mollit cupidatat?",
+          "review_id": 1
+        }
+      ]
+    }
   }
 }
