@@ -1,7 +1,10 @@
 const express = require("express");
-const { getCategories, getEndpointJSON, getReviewById, getReviews, getCommentsByArticleId } = require("./controllers/controller.js");
+const { getCategories, getEndpointJSON, getReviewById, getReviews, getCommentsByArticleId, postCommentByReviewId } = require("./controllers/controller.js");
 
 const app = express();
+app.use(express.json())
+
+
 
 app.get("/api", getEndpointJSON);
 
@@ -13,12 +16,20 @@ app.get("/api/reviews", getReviews);
 
 app.get("/api/reviews/:review_id/comments", getCommentsByArticleId);
 
+app.post("/api/reviews/:review_id/comments", postCommentByReviewId);
+
+
+
 app.all("/*", (req, res) => {
     res.status(404).send({ msg: "Not Found" });
 });
 
 app.use((err, req, res, next) => {
     if (err.code === "22P02") {
+        res.status(400).send({ msg: "Bad Request" });
+    } else if (err.code === "23503") {
+        res.status(404).send({ msg: "Not Found" });
+    } else if (err.code === "23502") {
         res.status(400).send({ msg: "Bad Request" });
     } else {
         next(err);
