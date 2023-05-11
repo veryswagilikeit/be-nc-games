@@ -1,4 +1,4 @@
-const { selectCategories } = require("../models/model")
+const { selectCategories, selectReviews } = require("../models/model")
 const endpointsJSON = require("../endpoints.json");
 
 exports.getEndpointJSON = (req, res, next) => {
@@ -10,4 +10,16 @@ exports.getCategories = (req, res, next) => {
         res.status(200).send({ categories });
     })
     .catch(next);
+};
+
+
+
+
+
+
+
+exports.getReviews = (req, res) => {
+    selectReviews().then((reviews) => {
+        res.status(200).send({ reviews });
+    });
 };
