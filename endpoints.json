@@ -80,5 +80,19 @@
         }
       ]
     }
+  },
+  "POST /api/reviews/:review_id/comments": {
+    "description": "inserts the comment provided into the database and returns in to the user",
+    "queries": [],
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 69,
+        "body": "very cool very swag i like it",
+        "review_id": 1,
+        "author": "tickle122",
+        "votes": 0,
+        "created_at": "2023-05-11T15:37:22.412Z"
+      }
+    }
   }
 }

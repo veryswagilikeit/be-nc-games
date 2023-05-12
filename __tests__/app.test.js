@@ -15,10 +15,9 @@ describe("3. GET /api/categories", () => {
         return request(app)
             .get("/api/categories")
             .expect(200)
-            .then(({ body: categories }) => {
-                const categoryArr = categories.categories;
-                expect(categoryArr).toHaveLength(4);
-                categoryArr.forEach((category) => {
+            .then(({ body: {categories} }) => {
+                expect(categories).toHaveLength(4);
+                categories.forEach((category) => {
                     expect(category).toEqual(
                         expect.objectContaining({
                             slug: expect.any(String),
@@ -34,8 +33,7 @@ describe("3. GET /api/categories", () => {
             return request(app)
                 .get("/not-a-route")
                 .expect(404)
-                .then((res) => {
-                    const body = res.body;
+                .then(({ body }) => {
                     expect(body).toEqual({ msg: "Not Found" })
                 });
         });
@@ -47,8 +45,7 @@ describe("3.5. GET /api", () => {
         return request(app)
             .get("/api")
             .expect(200)
-            .then((res) => {
-                const body = res.body;
+            .then(({ body }) => {
                 expect(body).toEqual(json);
             });
     });
@@ -80,8 +77,7 @@ describe("4. GET /api/reviews/:review_id", () => {
             return request(app)
                 .get("/api/reviews/9999")
                 .expect(404)
-                .then((res) => {
-                    const body = res.body;
+                .then(({ body }) => {
                     expect(body).toEqual({ msg: "Not Found" });
                 });
         });
@@ -90,8 +86,7 @@ describe("4. GET /api/reviews/:review_id", () => {
             return request(app)
                 .get("/api/reviews/notanumber")
                 .expect(400)
-                .then((res) => {
-                    const body = res.body;
+                .then(({ body }) => {
                     expect(body).toEqual({ msg: "Bad Request" });
             });
         });
@@ -103,11 +98,10 @@ describe("5. GET /api/reviews", () => {
         return request(app)
             .get("/api/reviews")
             .expect(200)
-            .then(({ body: reviews }) => {
-                const reviewsArr = reviews.reviews;
-                expect(reviewsArr).toHaveLength(13);
-                expect(reviewsArr[4].comment_count).toBe(3);
-                reviewsArr.forEach((review) => {
+            .then(({ body: {reviews} }) => {
+                expect(reviews).toHaveLength(13);
+                expect(reviews[4].comment_count).toBe(3);
+                reviews.forEach((review) => {
                     expect("body" in review).toBe(false);
                     expect(review).toEqual(
                         expect.objectContaining({
@@ -130,7 +124,7 @@ describe("5. GET /api/reviews", () => {
         return request(app)
             .get("/api/reviews")
             .expect(200)
-            .then(({ body: { reviews } }) => {
+            .then(({ body: {reviews} }) => {
                 expect(reviews).toBeSortedBy("created_at", {descending: true});
             });
     });
@@ -142,9 +136,8 @@ describe("6. GET /api/reviews/:review_id/comments", () => {
         return request(app)
             .get(`/api/reviews/${id}/comments`)
             .expect(200)
-            .then(({ body: comments }) => {
-                const commentsArr = comments.comments;
-                expect(commentsArr).toEqual([]);
+            .then(({ body: {comments} }) => {
+                expect(comments).toEqual([]);
             });
     });
 
@@ -153,9 +146,8 @@ describe("6. GET /api/reviews/:review_id/comments", () => {
         return request(app)
             .get(`/api/reviews/${id}/comments`)
             .expect(200)
-            .then(({ body: comments }) => {
-                const commentsArr = comments.comments;
-                commentsArr.forEach((comment) => {
+            .then(({ body: {comments} }) => {
+                comments.forEach((comment) => {
                     expect(comment).toEqual(
                         expect.objectContaining({
                             comment_id: expect.any(Number),
@@ -163,6 +155,7 @@ describe("6. GET /api/reviews/:review_id/comments", () => {
                             body: expect.any(String),
                             created_at: expect.any(String),
                             votes: expect.any(Number),
+                            review_id: expect.any(Number)
                         })
                     );
                 });
@@ -174,7 +167,7 @@ describe("6. GET /api/reviews/:review_id/comments", () => {
         return request(app)
             .get(`/api/reviews/${id}/comments`)
             .expect(200)
-            .then(({ body: { comments } }) => {
+            .then(({ body: {comments} }) => {
                 expect(comments).toBeSortedBy("created_at", {descending: true});
             });
     });
@@ -184,8 +177,7 @@ describe("6. GET /api/reviews/:review_id/comments", () => {
             return request(app)
                 .get("/api/reviews/9999/comments")
                 .expect(404)
-                .then((res) => {
-                    const body = res.body;
+                .then(({ body }) => {
                     expect(body).toEqual({ msg: "Not Found" });
                 });
         });
@@ -194,9 +186,126 @@ describe("6. GET /api/reviews/:review_id/comments", () => {
             return request(app)
                 .get("/api/reviews/notanumber/comments")
                 .expect(400)
-                .then((res) => {
-                    const body = res.body;
+                .then(({ body }) => {
                     expect(body).toEqual({ msg: "Bad Request" });
+                });
+        });
+    });
+});
+
+describe("7. POST /api/reviews/:review_id/comments", () => {
+    it("201: Should respond with the posted comment", () => {
+        const requestBody = {
+            username: "mallionaire",
+            body: "very cool very swag i like it"
+        };
+        return request(app)
+            .post("/api/reviews/1/comments")
+            .send(requestBody)
+            .expect(201)
+            .then(({ body: {comment} }) => {
+                expect(comment).toEqual(
+                    expect.objectContaining({
+                        comment_id: expect.any(Number),
+                        author: expect.any(String),
+                        body: expect.any(String),
+                        created_at: expect.any(String),
+                        votes: expect.any(Number),
+                        review_id: expect.any(Number)
+                    })
+                );
+            });
+    });
+
+    it("201: Should ignore all properties in requestBody except username and body", () => {
+        const requestBody = {
+            username: "mallionaire",
+            body: "very cool very swag i like it",
+            ignoreme: ">:-("
+        };
+        return request(app)
+            .post("/api/reviews/1/comments")
+            .send(requestBody)
+            .expect(201)
+            .then(({ body: {comment} }) => {
+                expect(comment).toEqual(
+                    expect.objectContaining({
+                        comment_id: expect.any(Number),
+                        author: expect.any(String),
+                        body: expect.any(String),
+                        created_at: expect.any(String),
+                        votes: expect.any(Number),
+                        review_id: expect.any(Number)
+                    })
+                );
+            });
+    });
+
+    describe("Errors", () => {
+        it("404: Should return a 'Not Found' error when an endpoint with the provided ID doesn't exist", () => {
+            const requestBody = {
+                username: "mallionaire",
+                body: "very cool very swag i like it"
+            };
+            return request(app)
+                .post("/api/reviews/9999/comments")
+                .send(requestBody)
+                .expect(404)
+                .then(({ body }) => {
+                    expect(body).toEqual({ msg: "Not Found" });
+                });
+        });
+
+        it("400: Should return a 'Bad Request' error when the provided ID is an incorrect data type", () => {
+            const requestBody = {
+                username: "mallionaire",
+                body: "very cool very swag i like it"
+            };
+            return request(app)
+                .post("/api/reviews/notanumber/comments")
+                .send(requestBody)
+                .expect(400)
+                .then(({ body }) => {
+                    expect(body).toEqual({ msg: "Bad Request" });
+                });
+        });
+
+        it("400: Should return a 'Bad Request' error when when passed an invalid object", () => {
+            const requestBody = {};
+            return request(app)
+                .post("/api/reviews/1/comments")
+                .send(requestBody)
+                .expect(400)
+                .then(({ body }) => {
+                    expect(body).toEqual({ msg: "Bad Request" });
+                });
+        });
+
+        it("400: Should return a 'Bad Request' error when when passed a comment body with incorrect data type", () => {
+            const requestBody = {
+                username: "mallionaire",
+                body: 10
+            };
+            return request(app)
+                .post("/api/reviews/1/comments")
+                .send(requestBody)
+                .expect(400)
+                .then(({ body }) => {
+                    expect(body).toEqual({ msg: "Bad Request" });
+                });
+        });
+
+        it("404: Should return a 'Not Found' error when when passed a username that doesn't exist", () => {
+            const requestBody = {
+                username: "jameswhite",
+                body: "very cool very swag i like it"
+            };
+            return request(app)
+                .post("/api/reviews/1/comments")
+                .send(requestBody)
+                .expect(404)
+                .then(({ body }) => {
+                    expect(body).toEqual({ msg: "Not Found" });
                 });
         });
     });

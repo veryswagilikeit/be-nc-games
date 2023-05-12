@@ -53,3 +53,21 @@ exports.selectCommentsByReviewId = (id) => {
             return comments;
         });
 };
+
+exports.insertCommentByReviewId = (id, usernameBodyObj) => {
+    const insertQuery = `INSERT INTO comments (review_id, author, body) VALUES ($1, $2, $3) RETURNING *;`;
+    const { username, body } = usernameBodyObj;
+    const params = [id, username, body];
+
+    return db
+        .query(insertQuery, params)
+        .then(({ rows }) => {
+            if (typeof body !== "string") {
+                return Promise.reject({
+                    status: 400,
+                    msg: "Bad Request",
+                });
+            };
+            return rows[0];
+        });
+};
