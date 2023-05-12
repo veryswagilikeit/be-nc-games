@@ -428,3 +428,30 @@ describe("9. DELETE /api/comments/:comment:id", () => {
         });
     });
 });
+
+describe("10. GET /api/users", () => {
+    it("200: Should respond with an array of user objects", () => {
+        return request(app)
+            .get("/api/users")
+            .expect(200)
+            .then(({ body: {users} }) => {
+                const user1 = {
+                    username: 'mallionaire',
+                    name: 'haz',
+                    avatar_url:
+                      'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg'
+                  }
+                expect(users).toHaveLength(4);
+                expect(users[0]).toEqual(user1);
+                users.forEach((user) => {
+                    expect(user).toEqual(
+                        expect.objectContaining({
+                            username: expect.any(String),
+                            name: expect.any(String),
+                            avatar_url: expect.any(String)
+                        })
+                    );
+                });
+            });
+    });
+});
