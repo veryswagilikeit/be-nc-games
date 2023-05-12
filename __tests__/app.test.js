@@ -310,3 +310,93 @@ describe("7. POST /api/reviews/:review_id/comments", () => {
         });
     });
 });
+
+describe("8. PATCH /api/reviews/:review_id", () => {
+    it("200: Should respond with the updated review (positive votes value)", () => {
+        return request(app)
+            .patch("/api/reviews/1")
+            .send({ inc_votes: 100 })
+            .expect(200)
+            .then(({ body: {review} }) => {
+                expect(review.votes).toBe(101);
+                expect(review).toEqual(
+                    expect.objectContaining({
+                        category: expect.any(String),
+                        created_at: expect.any(String),
+                        designer: expect.any(String),
+                        owner: expect.any(String),
+                        review_body: expect.any(String),
+                        review_id: expect.any(Number),
+                        review_img_url: expect.any(String),
+                        title: expect.any(String),
+                        votes: expect.any(Number)
+                    })
+                );
+            });
+    });
+
+    it("200: Should respond with the updated review (negative votes value)", () => {
+        return request(app)
+            .patch("/api/reviews/1")
+            .send({ inc_votes: -100 })
+            .expect(200)
+            .then(({ body: {review} }) => {
+                expect(review.votes).toBe(-99);
+                expect(review).toEqual(
+                    expect.objectContaining({
+                        category: expect.any(String),
+                        created_at: expect.any(String),
+                        designer: expect.any(String),
+                        owner: expect.any(String),
+                        review_body: expect.any(String),
+                        review_id: expect.any(Number),
+                        review_img_url: expect.any(String),
+                        title: expect.any(String),
+                        votes: expect.any(Number)
+                    })
+                );
+            });
+    });
+
+    describe("Errors", () => {
+        it("404: Should return a 'Not Found' error when an endpoint with the provided ID doesn't exist", () => {
+            return request(app)
+                .patch("/api/reviews/9999")
+                .send({ inc_votes: 100 })
+                .expect(404)
+                .then(({ body }) => {
+                    expect(body).toEqual({ msg: "Not Found" });
+                });
+        });
+
+        it("400: Should return a 'Bad Request' error when the provided ID is an incorrect data type", () => {
+            return request(app)
+                .patch("/api/reviews/notanumber")
+                .send({ inc_votes: 100 })
+                .expect(400)
+                .then(({ body }) => {
+                    expect(body).toEqual({ msg: "Bad Request" });
+                });
+        });
+
+        it("400: Should return a 'Bad Request' error when when passed an invalid object", () => {
+            return request(app)
+                .patch("/api/reviews/1")
+                .send({})
+                .expect(400)
+                .then(({ body }) => {
+                    expect(body).toEqual({ msg: "Bad Request" });
+                });
+        });
+
+        it("400: Should return a 'Bad Request' error when when passed a comment body with incorrect data type", () => {
+            return request(app)
+                .patch("/api/reviews/1")
+                .send({ inc_votes: "not a number" })
+                .expect(400)
+                .then(({ body }) => {
+                    expect(body).toEqual({ msg: "Bad Request" });
+                });
+        });
+    });
+});
