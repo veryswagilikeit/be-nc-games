@@ -89,3 +89,16 @@ exports.updateReviewVotes = (id, votesObj) => {
             };
         });
 };
+
+exports.removeCommentById = (id) => {
+    return db
+        .query(`DELETE FROM comments where comment_id = $1 RETURNING *;`, [id])
+        .then(({ rows }) => {
+            if (!rows.length) {
+                return Promise.reject({
+                    status: 404,
+                    msg: "Not Found"
+                });
+            };
+        });
+};

@@ -112,5 +112,11 @@
         "votes": 1
       }
     }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes the comment with the corresponding id and responds with no content",
+    "queries": [],
+    "exampleBody": {},
+    "exampleResponse": ""
   }
 }

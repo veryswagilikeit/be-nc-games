@@ -400,3 +400,31 @@ describe("8. PATCH /api/reviews/:review_id", () => {
         });
     });
 });
+
+describe("9. DELETE /api/comments/:comment:id", () => {
+    it("204: Should respond with no content", () => {
+        return request(app)
+            .delete("/api/comments/6")
+            .expect(204, '');
+    });
+
+    describe("Errors", () => {
+        it("404: Should return a 'Not Found' error when an endpoint with the provided ID doesn't exist", () => {
+            return request(app)
+                .delete("/api/comments/9999")
+                .expect(404)
+                .then(({ body }) => {
+                    expect(body).toEqual({ msg: "Not Found" });
+                });
+        });
+
+        it("400: Should return a 'Bad Request' error when the provided ID is an incorrect data type", () => {
+            return request(app)
+                .delete("/api/comments/notanumber")
+                .expect(400)
+                .then(({ body }) => {
+                    expect(body).toEqual({ msg: "Bad Request" });
+                });
+        });
+    });
+});

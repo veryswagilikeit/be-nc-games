@@ -1,4 +1,4 @@
-const { selectCategories, selectReviewById, selectReviews, selectCommentsByReviewId, insertCommentByReviewId, updateReviewVotes } = require("../models/model")
+const { selectCategories, selectReviewById, selectReviews, selectCommentsByReviewId, insertCommentByReviewId, updateReviewVotes, removeCommentById } = require("../models/model")
 const endpointsJSON = require("../endpoints.json");
 
 exports.getEndpointJSON = (req, res, next) => {
@@ -52,6 +52,15 @@ exports.patchReviewVotes = (req, res, next) => {
     updateReviewVotes(id, votesObj)
         .then((review) => {
             res.status(200).send({ review });
+        })
+        .catch(next);
+};
+
+exports.deleteCommentById = (req, res, next) => {
+    const id = req.params.comment_id;
+    removeCommentById(id)
+        .then(() => {
+            res.sendStatus(204);
         })
         .catch(next);
 };
