@@ -71,3 +71,21 @@ exports.insertCommentByReviewId = (id, usernameBodyObj) => {
             return rows[0];
         });
 };
+
+exports.updateReviewVotes = (id, votesObj) => {
+    const updateQuery = `UPDATE reviews SET votes=votes+ $2 WHERE review_id = $1 RETURNING *;`;
+    const params = [id, votesObj.inc_votes];
+
+    return db
+        .query(updateQuery, params)
+        .then(({ rows: review }) => {
+            if (!review.length) {
+                return Promise.reject({
+                    status: 404,
+                    msg: "Not Found"
+                });
+            } else {
+                return review[0];
+            };
+        });
+};

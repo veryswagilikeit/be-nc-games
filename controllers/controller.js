@@ -1,4 +1,4 @@
-const { selectCategories, selectReviewById, selectReviews, selectCommentsByReviewId, insertCommentByReviewId } = require("../models/model")
+const { selectCategories, selectReviewById, selectReviews, selectCommentsByReviewId, insertCommentByReviewId, updateReviewVotes } = require("../models/model")
 const endpointsJSON = require("../endpoints.json");
 
 exports.getEndpointJSON = (req, res, next) => {
@@ -42,6 +42,16 @@ exports.postCommentByReviewId = (req, res, next) => {
     insertCommentByReviewId(id, usernameBodyObj)
         .then((comment) => {
             res.status(201).send({ comment });
+        })
+        .catch(next);
+};
+
+exports.patchReviewVotes = (req, res, next) => {
+    const id = req.params.review_id;
+    const votesObj = req.body;
+    updateReviewVotes(id, votesObj)
+        .then((review) => {
+            res.status(200).send({ review });
         })
         .catch(next);
 };
