@@ -1,4 +1,4 @@
-const { selectCategories, selectReviewById, selectReviews, selectCommentsByReviewId, insertCommentByReviewId, updateReviewVotes, removeCommentById } = require("../models/model")
+const { selectCategories, selectReviewById, selectReviews, selectCommentsByReviewId, insertCommentByReviewId, updateReviewVotes, removeCommentById, selectUsers } = require("../models/model")
 const endpointsJSON = require("../endpoints.json");
 
 exports.getEndpointJSON = (req, res, next) => {
@@ -61,6 +61,14 @@ exports.deleteCommentById = (req, res, next) => {
     removeCommentById(id)
         .then(() => {
             res.sendStatus(204);
+        })
+        .catch(next);
+};
+
+exports.getUsers = (req, res, next) => {
+    selectUsers()
+        .then((users) => {
+            res.status(200).send({ users });
         })
         .catch(next);
 };
